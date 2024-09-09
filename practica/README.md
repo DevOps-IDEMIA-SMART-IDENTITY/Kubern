@@ -1,8 +1,8 @@
 # Práctica: Despliegue de una aplicación en Kubernetes
 
-<div style="text-align: center;">
-    <img src="img/diagram.png" alt="kubernetes logo" width="500"/>
-</div>
+<p align="center">
+    <img src="img/diagram.png" alt="application with database" width="500"/>
+</p>
 
 ## Objetivo General
 Desplegar una aplicación con una base de datos en Kubernetes utilizando Helm, asegurando que la aplicación sea accesible, escalable y que los datos se almacenen de forma persistente. La aplicación puede ser pública (e.g. Wordpress) o cualquier otra aplicación que se conecte a una base de datos (e.g. otra aplicación que hayáis desarrollado en otro curso de KeepCoding).

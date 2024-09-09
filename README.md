@@ -1,12 +1,8 @@
-<div style="text-align: center;">
+<h1 align="center">Kubernetes - Material de la asignatura</h1>
 
-# Kubernetes - Material de la asignatura
-
-</div>
-
-<div style="text-align: center;">
+<p align="center">
     <img src="img/k8s_logo.png" alt="kubernetes logo" width="150"/>
-</div>
+</p>
 
 ---
 
