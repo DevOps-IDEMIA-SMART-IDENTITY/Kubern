@@ -27,4 +27,9 @@ Puedes encontrar el enunciado de la práctica [aquí](practica/README.md).
 
 ### Sesión 2
 
-- Próxima sesión (10 de septiembre de 2024)
+#### Instalación de Kubernetes
+- [Slides](sesion2/slides/01-instalacion.pdf)
+
+#### Primeros pasos - Pods
+- [Slides](sesion2/slides/02-primeros-pasos-pods.pdf)
+- [Demos](sesion2/demos/)
