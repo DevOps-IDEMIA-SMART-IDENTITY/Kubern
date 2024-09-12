@@ -1,0 +1,21 @@
+apiVersion: apps/v1 # Version de la API (puede cambiar entre versiones de k8s)
+kind: Deployment  # TIPO: Deployment
+metadata: # Metadatos del Deployment
+  name: nginx-deployment
+  labels:
+    app: nginx-dep # este label existe a nivel de deployment
+spec: # Spec del DEPLOYMENT
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 2 # indica al controlador que ejecute 2 pods
+  template: # Aquí comienza el bloque del POD
+    metadata: # Metadatos del POD
+      labels:  # Labels del POD (distintos a los del deployment!)
+        app: nginx
+    spec: # Especificación del POD
+      containers: # Declaración de los contenedores del POD
+      - name: nginx
+        image: nginx
+        ports:
+        - containerPort: 80
