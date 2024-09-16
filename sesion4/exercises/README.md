@@ -238,6 +238,9 @@ Monitorea el Pod para asegurarte de que ya no se reinicia por OOMKilled:
 kubectl describe pod mi-pod-xxxx
 ```
 
+</details>
+
+
 ### Ejercicio 7: Desplegar MariaDB con Persistencia utilizando un PersistentVolumeClaim (PVC)
 - Problema: Despliega una instancia de MariaDB en Minikube utilizando un PersistentVolumeClaim para el almacenamiento de datos. Luego, verifica que el PVC esté correctamente asociado y funcionando.
 
