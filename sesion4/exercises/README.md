@@ -237,3 +237,117 @@ Monitorea el Pod para asegurarte de que ya no se reinicia por OOMKilled:
 ```bash
 kubectl describe pod mi-pod-xxxx
 ```
+
+### Ejercicio 7: Desplegar MariaDB con Persistencia utilizando un PersistentVolumeClaim (PVC)
+- Problema: Despliega una instancia de MariaDB en Minikube utilizando un PersistentVolumeClaim para el almacenamiento de datos. Luego, verifica que el PVC esté correctamente asociado y funcionando.
+
+<details>
+
+<summary>📌 Solución</summary>
+
+Crea un archivo `mariadb-statefulset.yaml` para definir el despliegue de MariaDB con el PVC:
+
+```yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mariadb
+  labels:
+    app: mariadb
+spec:
+  # serviceName: "mariadb-service"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mariadb
+  template:
+    metadata:
+      labels:
+        app: mariadb
+    spec:
+      containers:
+      - name: mariadb
+        image: mariadb:10.5
+        env:
+        - name: MARIADB_ROOT_PASSWORD
+          value: "tu_contraseña_segura" # Esto es un secreto y debería ser almacenado en un Secret. No lo hagas así ni en la práctica ni en la vida real.
+        ports:
+        - containerPort: 3306
+          name: mariadb
+        volumeMounts:
+        - name: mariadb-storage
+          mountPath: /var/lib/mariadb
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "150m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+  volumeClaimTemplates:
+  - metadata:
+      name: mariadb-storage
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: "standard"
+      resources:
+        requests:
+          storage: 1Gi
+```
+
+Verifica que el StatefulSet esté corriendo:
+
+```bash
+kubectl get statefulsets
+```
+
+Verifica que el Pod de MariaDB esté en ejecución:
+    
+```bash
+kubectl get pods -l app=mariadb
+```
+
+Verifica que los Persistent Volumes se hayan creado automáticamente:
+
+```bash
+kubectl get pv
+```
+
+Verifica que el Pod de MySQL esté utilizando el PVC correctamente:
+
+```bash
+kubectl describe pod mariadb-0
+```
+
+Accede a la base de datos MariaDB con la contraseña que estableciste (tu_contraseña_segura):
+
+```bash
+kubectl exec -it mariadb-0 -- mysql -u root -p
+```
+
+Y ejecuta:
+
+```sql
+CREATE DATABASE prueba_db;
+USE prueba_db;
+CREATE TABLE usuarios (id INT PRIMARY KEY, nombre VARCHAR(50));
+INSERT INTO usuarios VALUES (1, 'Juan'), (2, 'María');
+EXIT;
+```
+
+Prueba la persistencia de los datos reiniciando el Pod y verificando que los datos persistan:
+
+```bash
+kubectl delete pod mariadb-0
+kubectl get pods -l app=mariadb
+kubectl exec -it mariadb-0 -- mysql -u root -p
+```
+
+```sql
+USE prueba_db;
+SELECT * FROM usuarios;
+EXIT;
+```
+
+</details>
+
