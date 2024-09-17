@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: db-keepcoding
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db-keepcoding
+  serviceName: mariadb-keepcoding
+  template:
+    metadata:
+      labels:
+        app: db-keepcoding
+    spec:
+      containers:
+      - name: contenedor-keepcoding
+        image: mariadb
+        ports:
+        - containerPort: 3306
+        envFrom:
+        - secretRef:
+            name: db-secret-keepcoding
+        volumeMounts:
+        - name: db-persistent-storage
+          mountPath: /var/lib/mysql
+  volumeClaimTemplates:
+  - metadata:
+      name: db-persistent-storage
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
