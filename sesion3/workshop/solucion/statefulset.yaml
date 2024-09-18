@@ -1,50 +1,52 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: db-keepcoding
+  name: mariadb
 spec:
-  replicas: 1
   selector:
     matchLabels:
-      app: db-keepcoding
-  serviceName: db-keepcoding
+      app: mariadb
+  serviceName: mariadb
+  replicas: 1
   template:
     metadata:
       labels:
-        app: db-keepcoding
+        app: mariadb
     spec:
       containers:
-      - name: contenedor-keepcoding
-        image: mariadb
-        ports:
-        - containerPort: 3306
-        envFrom:
-        - secretRef:
-            name: db-secret-keepcoding
-        volumeMounts:
-        - name: db-persistent-storage
-          mountPath: /var/lib/mysql
-  volumeClaimTemplates:
-  - metadata:
-      name: db-persistent-storage
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      resources:
-        requests:
-          storage: 1Gi
+        - name: mariadb
+          image: mariadb:10.5
+          ports:
+            - containerPort: 3306
+              name: mariadb
+          envFrom:
+            - secretRef:
+                name: mariadb-secret
+          env:
+            - name: MARIADB_DATABASE
+              value: courses_db
+          volumeMounts:
+            - name: mariadb-storage
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: mariadb-storage
+          persistentVolumeClaim:
+            claimName: mariadb-pvc
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: db-secret-keepcoding
+  name: mariadb-secret
 type: Opaque
 data:
-  MYSQL_ROOT_PASSWORD: bWlwYXNzd29yZDEyMwo=
+  MARIADB_ROOT_PASSWORD: cm9vdHBhc3N3b3Jk        # 'rootpassword' en base64
+  MARIADB_USER: ZGJ1c2Vy                         # 'dbuser' en base64
+  MARIADB_PASSWORD: ZGJwYXNzd29yZA==             # 'dbpassword' en base64
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: db-keepcoding
+  name: mariadb
 spec:
   ports:
     - port: 3306
@@ -53,4 +55,15 @@ spec:
       name: mariadb
   clusterIP: None
   selector:
-    app: db-keepcoding
+    app: mariadb
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mariadb-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

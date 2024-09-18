@@ -62,7 +62,7 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
       - name: nginx
-        image: k8s.gcr.io/nginx-slim:0.8
+        image: nginx
         ports:
         - containerPort: 80
           name: web
@@ -74,7 +74,6 @@ spec:
       name: www
     spec:
       accessModes: [ "ReadWriteOnce" ]
-      storageClassName: "my-storage-class"
       resources:
         requests:
           storage: 1Gi
@@ -97,7 +96,7 @@ __CONSIDERACIONES IMPORTANTES SOBRE EL MANIFIESTO__:
 
 * `volumeClaimTemplates`: Define PVCs (`PersistentVolumeClaims`) que son solicitudes al sistema de storage para crear PVs (`PersistentVolumes`). El volumen final se montará donde indiquemos en el bloque `volumeMounts` del POD.
 
-* `storageClassName` ha de ser una clase definida en el sistema.
+* `storageClassName` ha de ser una clase definida en el sistema. Si no se especifica se usará la clase por defecto.
 
 * El mantenimiento y escalado de los `StatefulSet` se puede realizar de la misma manera que los `Deployment`
 
@@ -135,7 +134,7 @@ Examina los nombres de los pods, tienen una identidad / nombre estática.
 
   - Lanzamos pod `busybox:1.28` para hacer comprobaciones DNS:
 
-  ```
+  ```shell
   $ kubectl run -i --tty --image busybox:1.28 dns-test --restart=Never --rm
   ```
 
@@ -205,6 +204,12 @@ Creamos el LB:
 ```
 
 Esperamos a que el load balancer externo se cree y accedemos con el navegador.
+
+Si estamos usando minikube, podemos hacer un tunnel con el siguiente comando:
+
+```shell
+minikube tunnel
+```
 
 <a name="scale"></a>
 ## Escalando StatefulSets

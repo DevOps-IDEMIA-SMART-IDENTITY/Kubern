@@ -1,36 +1,112 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app-keepcoding
+  name: fastapi-app
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
-      app: app-keepcoding
+      app: fastapi-app
   template:
     metadata:
       labels:
-        app: app-keepcoding
+        app: fastapi-app
     spec:
       containers:
-      - name: contenedor-keepcoding
-        image: nginx:latest
-        ports:
-        - containerPort: 80
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 80
-          initialDelaySeconds: 15
-          periodSeconds: 20
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 80
-          initialDelaySeconds: 5
-          periodSeconds: 10
-        envFrom:
-        - secretRef:
-            name: secret-keepcoding
-        - configMapRef:
-            name: configmap-keepcoding
+        - name: fastapi-app
+          image: ghcr.io/ohmyplatform/fastapi-mariadb:main   # Reemplace con su imagen de Docker Hub
+          ports:
+            - containerPort: 80
+          envFrom:
+            - secretRef:
+                name: fastapi-secrets
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: fastapi-secrets
+type: Opaque
+data:
+  DATABASE_URL: bXlzcWwrcHlteXNxbDovL2RidXNlcjpkYnBhc3N3b3JkQG1hcmlhZGI6MzMwNi9jb3Vyc2VzX2Ri
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fastapi-service
+spec:
+  selector:
+    app: fastapi-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mariadb
+spec:
+  selector:
+    matchLabels:
+      app: mariadb
+  serviceName: mariadb
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mariadb
+    spec:
+      containers:
+        - name: mariadb
+          image: mariadb:10.5
+          ports:
+            - containerPort: 3306
+              name: mariadb
+          envFrom:
+            - secretRef:
+                name: mariadb-secret
+          env:
+            - name: MARIADB_DATABASE
+              value: courses_db
+          volumeMounts:
+            - name: mariadb-storage
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: mariadb-storage
+          persistentVolumeClaim:
+            claimName: mariadb-pvc
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mariadb-secret
+type: Opaque
+data:
+  MARIADB_ROOT_PASSWORD: cm9vdHBhc3N3b3Jk        # 'rootpassword' en base64
+  MARIADB_USER: ZGJ1c2Vy                         # 'dbuser' en base64
+  MARIADB_PASSWORD: ZGJwYXNzd29yZA==             # 'dbpassword' en base64
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mariadb
+spec:
+  ports:
+    - port: 3306
+      targetPort: 3306
+      protocol: TCP
+      name: mariadb
+  clusterIP: None
+  selector:
+    app: mariadb
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mariadb-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

@@ -5,7 +5,7 @@ metadata:
 spec:
   containers:
     - name: test-container
-      image: k8s.gcr.io/busybox
+      image: busybox
       command: [ "/bin/sh","-c","cat /app/config.yaml" ]
       volumeMounts:
       - name: config-volume

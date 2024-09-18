@@ -251,7 +251,6 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: special-config-multi
-  namespace: default
 data:
   SPECIAL_LEVEL: very
   SPECIAL_TYPE: charm
