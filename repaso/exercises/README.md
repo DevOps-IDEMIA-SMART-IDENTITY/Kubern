@@ -1,4 +1,4 @@
-## Ejercicio 1
+## Ejercicio 1
 
 - Problema: Crea manualmente la estructura básica de un chart de Helm llamado "myapp" con el archivo Chart.yaml.
 
