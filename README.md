@@ -83,7 +83,7 @@ Puedes encontrar el enunciado de la práctica [aquí](practica/README.md).
     - [Slides](sesion6/slides/02-helm.pdf)
 - [Ejercicios](sesion6/exercises/README.md)
 
-### Sesión 7
+### Sesión 7
 
 - Operadores y Monitorización
     - [Slides](sesion7/slides/01-operadores-monitorizacion.pdf)
