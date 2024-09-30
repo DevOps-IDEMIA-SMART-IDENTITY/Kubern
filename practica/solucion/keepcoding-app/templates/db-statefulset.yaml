@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "keepcoding-app.fullname" . }}-mariadb
+  labels:
+    {{- include "keepcoding-app.mariadbLabels" . | nindent 4 }}
+spec:
+  serviceName: {{ include "keepcoding-app.fullname" . }}-mariadb-headless
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "keepcoding-app.mariadbSelectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "keepcoding-app.mariadbSelectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: mariadb
+          image: "{{ .Values.mariadb.image.repository }}:{{ .Values.mariadb.image.tag }}"
+          imagePullPolicy: {{ .Values.mariadb.image.pullPolicy }}
+          ports:
+            - containerPort: 3306
+              name: mariadb
+          envFrom:
+            - secretRef:
+                name: {{ include "keepcoding-app.fullname" . }}-mariadb-secret
+          volumeMounts:
+            - name: mariadb-storage
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: mariadb-storage
+          persistentVolumeClaim:
+            claimName: {{ include "keepcoding-app.fullname" . }}-pvc

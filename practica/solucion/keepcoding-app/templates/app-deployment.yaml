@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "keepcoding-app.fullname" . }}
+  labels:
+    {{- include "keepcoding-app.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.app.autoscaling.enabled }}
+  replicas: {{ .Values.app.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "keepcoding-app.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+      {{- include "keepcoding-app.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: fastapi-app
+          image: "{{ .Values.app.image.repository }}:{{ .Values.app.image.tag }}"
+          imagePullPolicy: {{ .Values.app.image.pullPolicy }}
+          ports:
+            - containerPort: 80
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 80
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          envFrom:
+            - secretRef:
+                name: {{ include "keepcoding-app.fullname" . }}-secret
+          resources:
+            {{- toYaml .Values.app.resources | nindent 12 }}

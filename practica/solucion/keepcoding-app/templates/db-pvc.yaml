@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "keepcoding-app.fullname" . }}-pvc
+  labels:
+    {{- include "keepcoding-app.labels" . | nindent 4 }}
+spec:
+  accessModes:
+  {{- if .Values.mariadb.persistence.accessModes }}
+    {{- toYaml .Values.mariadb.persistence.accessModes | nindent 4 }}
+  {{- else }}
+    - ReadWriteOnce
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.mariadb.persistence.size }}

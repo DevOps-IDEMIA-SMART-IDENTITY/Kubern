@@ -1,0 +1,36 @@
+app:
+  replicaCount: 2
+
+  image:
+    repository: ghcr.io/ohmyplatform/fastapi-mariadb
+    tag: "main"
+    pullPolicy: IfNotPresent
+
+  ingress:
+    enabled: true
+    host: keepcoding-127-0-0-1.nip.io
+    path: /
+
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
+
+mariadb:
+  image:
+    repository: mariadb
+    tag: "10.5"
+    pullPolicy: IfNotPresent
+  auth:
+    database: courses_db
+  persistence:
+    size: 1Gi
